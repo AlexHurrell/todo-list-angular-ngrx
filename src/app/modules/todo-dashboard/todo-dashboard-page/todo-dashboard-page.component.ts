@@ -38,13 +38,13 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   ngOnInit(): void {}
 
   addItem() {
-    this.dataSource.data.push({
-      name: this.latestTask,
-      date: String(new Date().getTime()),
-    });
-
-    this.dataSource = new MatTableDataSource(this.dataSource.data);
-    this.dataSource.sort = this.sort;
+    if (this.latestTask) {
+      this.dataSource.data.push({
+        name: this.latestTask,
+        date: String(new Date().getTime()),
+      });
+    }
+    this.setDataSource(this.dataSource.data);
     this.latestTask = '';
   }
 
@@ -56,8 +56,7 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   deleteItem(index: number) {
     console.log(index);
     this.dataSource.data.splice(index, 1);
-    this.dataSource = new MatTableDataSource(this.dataSource.data);
-    this.dataSource.sort = this.sort;
+    this.setDataSource(this.dataSource.data);
   }
 
   renameDialog(i) {
@@ -71,9 +70,13 @@ export class TodoDashboardPageComponent implements AfterViewInit {
             ? String(new Date().getTime())
             : this.dataSource.data[i].date,
         };
-        this.dataSource = new MatTableDataSource(this.dataSource.data);
-        this.dataSource.sort = this.sort;
+        this.setDataSource(this.dataSource.data);
       }
     });
+  }
+
+  private setDataSource(data: TodoItem[]) {
+    this.dataSource = new MatTableDataSource(data);
+    this.dataSource.sort = this.sort;
   }
 }
