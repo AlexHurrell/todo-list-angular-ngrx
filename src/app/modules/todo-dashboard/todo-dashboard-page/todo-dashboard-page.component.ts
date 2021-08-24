@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
@@ -9,6 +9,7 @@ const storageKey = 'TodoAngular';
 interface TodoItem {
   name: string;
   date: string;
+  complete: boolean;
 }
 
 @Component({
@@ -16,20 +17,25 @@ interface TodoItem {
   templateUrl: './todo-dashboard-page.component.html',
   styleUrls: ['./todo-dashboard-page.component.scss'],
 })
-export class TodoDashboardPageComponent implements AfterViewInit {
+export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
   todoDashboard: TodoItem[] = [
-    { name: 'groceries', date: '1329793814334' },
-    { name: 'coding', date: '1429793814334' },
-    { name: 'running', date: '1529793814334' },
-    { name: 'apartment searching', date: '1629793814334' },
+    { name: 'groceries', date: '1329793814334', complete: false },
+    { name: 'coding', date: '1429793814334', complete: false },
+    { name: 'running', date: '1529793814334', complete: false },
+    { name: 'apartment searching', date: '1629793814334', complete: false },
   ];
 
-  displayedColumns: string[] = ['name', 'date', 'actions'];
+  displayedColumns: string[] = ['name', 'date', 'completed', 'actions'];
   dataSource;
 
   @ViewChild(MatSort) sort: MatSort;
 
   ngAfterViewInit() {
+    // this.dataSource.sort = {
+    //   ...this.sort,
+    //   sortables:
+    //     JSON.parse(localStorage.getItem('sort')) ?? this.sort.sortables,
+    // };
     this.dataSource.sort = this.sort;
   }
 
@@ -38,6 +44,13 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {
+    // const { sort, dataSource } = JSON.parse(
+    //   localStorage.getItem(storageKey)
+    // ) ?? { sort: this.sort, dataSource: this.todoDashboard };
+
+    // this.dataSource = new MatTableDataSource(dataSource);
+    // this.dataSource.sort = sort;
+
     this.dataSource = new MatTableDataSource(
       JSON.parse(localStorage.getItem(storageKey)) ?? this.todoDashboard
     );
@@ -64,6 +77,11 @@ export class TodoDashboardPageComponent implements AfterViewInit {
     this.setDataSource(this.dataSource.data);
   }
 
+  completeTask(i: number, $event) {
+    this.dataSource.data[i].completed = $event.checked;
+    this.setDataSource(this.dataSource.data);
+  }
+
   renameDialog(i) {
     const dialogRef = this.dialog.open(RenameDialogComponent, {});
 
@@ -83,6 +101,11 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   private setDataSource(data: TodoItem[]) {
     this.dataSource = new MatTableDataSource(data);
     this.dataSource.sort = this.sort;
+    // const storage = {
+    //   sort: this.dataSource.sort,
+    //   dataSource: this.dataSource.data,
+    // };
+    // localStorage.setItem(storageKey, JSON.stringify(storage));
     localStorage.setItem(storageKey, JSON.stringify(this.dataSource.data));
   }
 }
