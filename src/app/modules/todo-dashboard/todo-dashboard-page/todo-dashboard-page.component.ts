@@ -1,6 +1,8 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
 
 interface TodoItem {
   name: string;
@@ -31,7 +33,7 @@ export class TodoDashboardPageComponent implements AfterViewInit {
 
   latestTask: string;
 
-  constructor() {}
+  constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {}
 
@@ -42,12 +44,36 @@ export class TodoDashboardPageComponent implements AfterViewInit {
     });
 
     this.dataSource = new MatTableDataSource(this.dataSource.data);
+    this.dataSource.sort = this.sort;
     this.latestTask = '';
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   deleteItem(index: number) {
     console.log(index);
     this.dataSource.data.splice(index, 1);
     this.dataSource = new MatTableDataSource(this.dataSource.data);
+    this.dataSource.sort = this.sort;
+  }
+
+  renameDialog(i) {
+    const dialogRef = this.dialog.open(RenameDialogComponent, {});
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.dataSource.data[i] = {
+          name: result.name,
+          date: result.resetDate
+            ? String(new Date().getTime())
+            : this.dataSource.data[i].date,
+        };
+        this.dataSource = new MatTableDataSource(this.dataSource.data);
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 }
