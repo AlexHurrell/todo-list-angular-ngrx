@@ -16,10 +16,10 @@ interface TodoItem {
 })
 export class TodoDashboardPageComponent implements AfterViewInit {
   todoDashboard: TodoItem[] = [
-    { name: 'groceries', date: '1629733816' },
-    { name: 'coding', date: '1629733858' },
-    { name: 'running', date: '1629733861' },
-    { name: 'apartment searching', date: '1629733865' },
+    { name: 'groceries', date: '1329793814334' },
+    { name: 'coding', date: '1429793814334' },
+    { name: 'running', date: '1529793814334' },
+    { name: 'apartment searching', date: '1629793814334' },
   ];
 
   displayedColumns: string[] = ['name', 'date', 'actions'];

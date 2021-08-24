@@ -9,7 +9,18 @@
   width: 100%;
 }
 .mat-column-actions {
-  width: 150px;
-  text-align: center;
+  flex: 0 0 20% !important;
+  width: 20% !important;
+  text-align: right;
   font-weight: bold;
+}
+
+.mat-column-name {
+  flex: 0 0 50% !important;
+  width: 50% !important;
+}
+
+.mat-column-date {
+  flex: 0 0 30% !important;
+  width: 30% !important;
 }
