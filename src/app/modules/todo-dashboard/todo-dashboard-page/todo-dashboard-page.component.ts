@@ -4,6 +4,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
 
+const storageKey = 'TodoAngular';
+
 interface TodoItem {
   name: string;
   date: string;
@@ -23,7 +25,7 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   ];
 
   displayedColumns: string[] = ['name', 'date', 'actions'];
-  dataSource = new MatTableDataSource(this.todoDashboard);
+  dataSource;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -35,7 +37,11 @@ export class TodoDashboardPageComponent implements AfterViewInit {
 
   constructor(public dialog: MatDialog) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.dataSource = new MatTableDataSource(
+      JSON.parse(localStorage.getItem(storageKey)) ?? this.todoDashboard
+    );
+  }
 
   addItem() {
     if (this.latestTask) {
@@ -54,7 +60,6 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   }
 
   deleteItem(index: number) {
-    console.log(index);
     this.dataSource.data.splice(index, 1);
     this.setDataSource(this.dataSource.data);
   }
@@ -78,5 +83,6 @@ export class TodoDashboardPageComponent implements AfterViewInit {
   private setDataSource(data: TodoItem[]) {
     this.dataSource = new MatTableDataSource(data);
     this.dataSource.sort = this.sort;
+    localStorage.setItem(storageKey, JSON.stringify(this.dataSource.data));
   }
 }
