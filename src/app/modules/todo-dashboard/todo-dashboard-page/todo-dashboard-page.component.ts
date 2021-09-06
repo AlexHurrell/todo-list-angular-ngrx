@@ -1,7 +1,7 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
 
 const storageKey = 'TodoAngular';
@@ -31,11 +31,6 @@ export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
 
   ngAfterViewInit() {
-    // this.dataSource.sort = {
-    //   ...this.sort,
-    //   sortables:
-    //     JSON.parse(localStorage.getItem('sort')) ?? this.sort.sortables,
-    // };
     this.dataSource.sort = this.sort;
   }
 
@@ -44,13 +39,6 @@ export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {
-    // const { sort, dataSource } = JSON.parse(
-    //   localStorage.getItem(storageKey)
-    // ) ?? { sort: this.sort, dataSource: this.todoDashboard };
-
-    // this.dataSource = new MatTableDataSource(dataSource);
-    // this.dataSource.sort = sort;
-
     this.dataSource = new MatTableDataSource(
       JSON.parse(localStorage.getItem(storageKey)) ?? this.todoDashboard
     );
@@ -101,11 +89,6 @@ export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
   private setDataSource(data: TodoItem[]) {
     this.dataSource = new MatTableDataSource(data);
     this.dataSource.sort = this.sort;
-    // const storage = {
-    //   sort: this.dataSource.sort,
-    //   dataSource: this.dataSource.data,
-    // };
-    // localStorage.setItem(storageKey, JSON.stringify(storage));
     localStorage.setItem(storageKey, JSON.stringify(this.dataSource.data));
   }
 }
