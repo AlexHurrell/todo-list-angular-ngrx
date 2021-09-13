@@ -10,6 +10,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TodoDashboardModule } from './modules/todo-dashboard/todo-dashboard.module';
 import { FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
+import { itemsReducer } from './modules/todo-dashboard/state/reducer';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,7 +25,8 @@ import { StoreModule } from '@ngrx/store';
     BrowserAnimationsModule,
     MatIconModule,
     FormsModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ items: itemsReducer }),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -3,14 +3,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { RenameDialogComponent } from '../rename-dialog/rename-dialog.component';
-
-const storageKey = 'TodoAngular';
-
-interface TodoItem {
-  name: string;
-  date: string;
-  complete: boolean;
-}
+import { v4 as uuidv4 } from 'uuid';
+import { select, Store } from '@ngrx/store';
+import {
+  addItem,
+  completeItem,
+  removeItem,
+  renameItem,
+} from '../../state/actions';
+import { selectItems } from '../../state/selectors';
+import { storageKey, TodoItem } from '../../models/models';
 
 @Component({
   selector: 'app-todo-dashboard-page',
@@ -19,14 +21,36 @@ interface TodoItem {
 })
 export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
   todoDashboard: TodoItem[] = [
-    { name: 'groceries', date: '1329793814334', complete: false },
-    { name: 'coding', date: '1429793814334', complete: false },
-    { name: 'running', date: '1529793814334', complete: false },
-    { name: 'apartment searching', date: '1629793814334', complete: false },
+    {
+      id: '110ec58a-a0f2-4ac4-8393-c866d813b8d1',
+      name: 'groceries',
+      date: '1329793814334',
+      complete: false,
+    },
+    {
+      id: '110ec58a-a0f2-4ac4-8393-c866d813b8d2',
+      name: 'coding',
+      date: '1429793814334',
+      complete: false,
+    },
+    {
+      id: '110ec58a-a0f2-4ac4-8393-c866d813b8d3',
+      name: 'running',
+      date: '1529793814334',
+      complete: false,
+    },
+    {
+      id: '110ec58a-a0f2-4ac4-8393-c866d813b8d4',
+      name: 'apartment searching',
+      date: '1629793814334',
+      complete: false,
+    },
   ];
 
-  displayedColumns: string[] = ['name', 'date', 'completed', 'actions'];
+  displayedColumns: string[] = ['name', 'date', 'complete', 'actions'];
   dataSource;
+
+  items$ = this.store.pipe(select(selectItems));
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -36,23 +60,22 @@ export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
 
   latestTask: string;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, public store: Store) {}
 
   ngOnInit(): void {
-    this.dataSource = new MatTableDataSource(
-      JSON.parse(localStorage.getItem(storageKey)) ?? this.todoDashboard
-    );
+    this.store.pipe(select(selectItems)).subscribe((items) => {
+      this.setDataSource(items);
+    });
   }
 
   addItem() {
-    if (this.latestTask) {
-      this.dataSource.data.push({
-        name: this.latestTask,
-        date: String(new Date().getTime()),
-      });
-    }
-    this.setDataSource(this.dataSource.data);
-    this.latestTask = '';
+    const todo: TodoItem = {
+      id: uuidv4(),
+      name: this.latestTask,
+      date: String(new Date().getTime()),
+      complete: false,
+    };
+    this.store.dispatch(addItem({ todo }));
   }
 
   applyFilter(event: Event) {
@@ -60,28 +83,28 @@ export class TodoDashboardPageComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  deleteItem(index: number) {
-    this.dataSource.data.splice(index, 1);
-    this.setDataSource(this.dataSource.data);
+  deleteItem(todo: TodoItem) {
+    this.store.dispatch(removeItem({ todo }));
   }
 
-  completeTask(i: number, $event) {
-    this.dataSource.data[i].completed = $event.checked;
-    this.setDataSource(this.dataSource.data);
+  completeTask(element: TodoItem) {
+    const todo = { ...element, complete: !element.complete };
+    this.store.dispatch(completeItem({ todo }));
   }
 
-  renameDialog(i) {
+  renameDialog(element: TodoItem, i: number) {
     const dialogRef = this.dialog.open(RenameDialogComponent, {});
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data[i] = {
+        const todo = {
+          ...element,
           name: result.name,
           date: result.resetDate
             ? String(new Date().getTime())
             : this.dataSource.data[i].date,
         };
-        this.setDataSource(this.dataSource.data);
+        this.store.dispatch(renameItem({ todo }));
       }
     });
   }

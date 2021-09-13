@@ -12,6 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { RenameDialogComponent } from './components/rename-dialog/rename-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { StoreModule } from '@ngrx/store';
+import { itemsReducer } from './state/reducer';
 
 @NgModule({
   declarations: [TodoDashboardPageComponent, RenameDialogComponent],
@@ -28,6 +30,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatDialogModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    StoreModule.forRoot({ items: itemsReducer }),
   ],
 })
 export class TodoDashboardModule {}
